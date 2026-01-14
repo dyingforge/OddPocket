@@ -4,7 +4,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Link from "next/link"
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
-import { useAccount } from 'wagmi'
+import { useAccount, usePublicClient } from 'wagmi'
 import Image from "next/image"
 import RedPacketCard from "@/components/RedPacketCard"
 import { Coins, Gift, Send, User } from "lucide-react"
@@ -12,6 +12,8 @@ import type { RedPacketInfo } from "@/types"
 import { 
   useReadRedPacketGetParticipantClaimedAmount,
   useReadRedPacketGetParticipantSendAmount,
+  useReadRedPacketGetUserRedPackets,
+  redPacketAddress,
 } from "@/generated";
 
 interface DisplayProfile {
@@ -23,7 +25,9 @@ interface DisplayProfile {
 export default function Profile() {
   const router = useRouter();
   const { address, isConnected } = useAccount()
+  const publicClient = usePublicClient();
   const [isLoading, setIsLoading] = useState(true)
+  const [myRedPackets, setMyRedPackets] = useState<RedPacketInfo[]>([])
   
   // 从合约读取用户数据
   const { data: userClaimedAmount } = useReadRedPacketGetParticipantClaimedAmount({
@@ -34,17 +38,84 @@ export default function Profile() {
     args: address ? [address] : undefined,
   });
   
+  // 获取用户创建的红包 ID 列表
+  const { data: userRedPacketIds } = useReadRedPacketGetUserRedPackets({
+    args: address ? [address] : undefined,
+  });
+  
   // 显示的用户资料
   const [displayProfile, setDisplayProfile] = useState<DisplayProfile>({
     name: "WealthWarrior",
     claimAmount: 0,
     sendAmount: 0,
   })
-  
-  // Mock 红包数据 - 实际应用中应该通过事件或后端 API 获取
-  const [myRedPackets] = useState<RedPacketInfo[]>([
-    // 这里可以添加用户创建的红包列表
-  ])
+
+  // 获取用户创建的红包详情
+  const fetchUserRedPackets = async () => {
+    if (!publicClient || !userRedPacketIds || userRedPacketIds.length === 0) {
+      setMyRedPackets([]);
+      return;
+    }
+
+    try {
+      const packets: RedPacketInfo[] = [];
+      
+      for (const packetId of userRedPacketIds) {
+        try {
+          const packetInfo = await publicClient.readContract({
+            address: redPacketAddress[421614],
+            abi: [
+              {
+                type: 'function',
+                inputs: [{ name: '_index', internalType: 'uint256', type: 'uint256' }],
+                name: 'getRedPacketInfo',
+                outputs: [
+                  {
+                    name: '',
+                    internalType: 'struct RedPacket.RedPacketInfo',
+                    type: 'tuple',
+                    components: [
+                      { name: 'description', internalType: 'string', type: 'string' },
+                      { name: 'owner', internalType: 'address', type: 'address' },
+                      { name: 'claimer', internalType: 'address', type: 'address' },
+                      { name: 'totalAmount', internalType: 'uint256', type: 'uint256' },
+                      { name: 'claimedAmount', internalType: 'uint256', type: 'uint256' },
+                      { name: 'token', internalType: 'address', type: 'address' },
+                      { name: 'isActive', internalType: 'bool', type: 'bool' },
+                    ],
+                  },
+                ],
+                stateMutability: 'view',
+              }
+            ],
+            functionName: 'getRedPacketInfo',
+            args: [packetId],
+          }) as any;
+
+          if (packetInfo.owner !== '0x0000000000000000000000000000000000000000') {
+            packets.push({
+              id: packetId.toString(),
+              description: packetInfo.description,
+              owner: packetInfo.owner,
+              claimer: packetInfo.claimer,
+              totalAmount: packetInfo.totalAmount,
+              claimedAmount: packetInfo.claimedAmount,
+              token: packetInfo.token,
+              isActive: packetInfo.isActive,
+              timestamp: BigInt(0),
+            });
+          }
+        } catch (err) {
+          console.error(`Failed to fetch packet ${packetId}:`, err);
+        }
+      }
+      
+      console.log('Fetched user red packets:', packets);
+      setMyRedPackets(packets);
+    } catch (error) {
+      console.error('Error fetching user red packets:', error);
+    }
+  };
 
   useEffect(() => {
     if (!isConnected) {
@@ -66,6 +137,13 @@ export default function Profile() {
       setIsLoading(false)
     }, 500)
   }, [isConnected, router, userClaimedAmount, userSendAmount])
+
+  // 获取用户红包列表
+  useEffect(() => {
+    if (isConnected && publicClient && userRedPacketIds !== undefined) {
+      fetchUserRedPackets();
+    }
+  }, [isConnected, publicClient, userRedPacketIds])
 
   return (
     <main

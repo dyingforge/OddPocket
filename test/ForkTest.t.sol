@@ -11,7 +11,7 @@ import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol
  * @dev 运行命令: forge test --fork-url https://sepolia-rollup.arbitrum.io/rpc --match-contract ForkTest -vvv
  */
 contract ForkTest is Test {
-    RedPacket public redPacket = RedPacket(0x9Ada12453663fd9B2d4d55986B519C9A558f5a95);
+    RedPacket public redPacket = RedPacket(0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55);
     
     address public constant WETH = 0x980B62Da83eFf3D4576C647993b0c1D7faf17c73;
     

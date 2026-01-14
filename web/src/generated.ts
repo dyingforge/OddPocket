@@ -10,7 +10,7 @@ import {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const redPacketAbi = [
   {
@@ -93,6 +93,15 @@ export const redPacketAbi = [
     inputs: [{ name: '_requestId', internalType: 'uint256', type: 'uint256' }],
     name: 'getRedPacketRequestIds',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_participant', internalType: 'address', type: 'address' },
+    ],
+    name: 'getUserRedPackets',
+    outputs: [{ name: '', internalType: 'uint256[]', type: 'uint256[]' }],
     stateMutability: 'view',
   },
   {
@@ -247,24 +256,31 @@ export const redPacketAbi = [
   },
   { type: 'error', inputs: [], name: 'RedPacket_AlreadyClaimed' },
   { type: 'error', inputs: [], name: 'RedPacket_NotOwner' },
+  { type: 'error', inputs: [], name: 'RedPacket_PacketNotExist' },
   {
     type: 'error',
     inputs: [],
     name: 'RedPacket_TotalAmountMustBeGreaterThanZero',
   },
   { type: 'error', inputs: [], name: 'RedPacket_TransferFailed' },
+  { type: 'error', inputs: [], name: 'ReentrancyGuardReentrantCall' },
+  {
+    type: 'error',
+    inputs: [{ name: 'token', internalType: 'address', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+  },
   { type: 'error', inputs: [], name: 'ZeroAddress' },
 ] as const
 
 /**
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const redPacketAddress = {
-  421614: '0x9Ada12453663fd9B2d4d55986B519C9A558f5a95',
+  421614: '0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55',
 } as const
 
 /**
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const redPacketConfig = {
   address: redPacketAddress,
@@ -278,7 +294,7 @@ export const redPacketConfig = {
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacket = /*#__PURE__*/ createUseReadContract({
   abi: redPacketAbi,
@@ -288,7 +304,7 @@ export const useReadRedPacket = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"getParticipantClaimedAmount"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketGetParticipantClaimedAmount =
   /*#__PURE__*/ createUseReadContract({
@@ -300,7 +316,7 @@ export const useReadRedPacketGetParticipantClaimedAmount =
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"getParticipantSendAmount"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketGetParticipantSendAmount =
   /*#__PURE__*/ createUseReadContract({
@@ -312,7 +328,7 @@ export const useReadRedPacketGetParticipantSendAmount =
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"getRedPacketInfo"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketGetRedPacketInfo =
   /*#__PURE__*/ createUseReadContract({
@@ -324,7 +340,7 @@ export const useReadRedPacketGetRedPacketInfo =
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"getRedPacketRequestIds"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketGetRedPacketRequestIds =
   /*#__PURE__*/ createUseReadContract({
@@ -334,9 +350,21 @@ export const useReadRedPacketGetRedPacketRequestIds =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"getUserRedPackets"`
+ *
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
+ */
+export const useReadRedPacketGetUserRedPackets =
+  /*#__PURE__*/ createUseReadContract({
+    abi: redPacketAbi,
+    address: redPacketAddress,
+    functionName: 'getUserRedPackets',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"owner"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketOwner = /*#__PURE__*/ createUseReadContract({
   abi: redPacketAbi,
@@ -347,7 +375,7 @@ export const useReadRedPacketOwner = /*#__PURE__*/ createUseReadContract({
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"s_vrfCoordinator"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useReadRedPacketSVrfCoordinator =
   /*#__PURE__*/ createUseReadContract({
@@ -359,7 +387,7 @@ export const useReadRedPacketSVrfCoordinator =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacket = /*#__PURE__*/ createUseWriteContract({
   abi: redPacketAbi,
@@ -369,7 +397,7 @@ export const useWriteRedPacket = /*#__PURE__*/ createUseWriteContract({
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"acceptOwnership"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketAcceptOwnership =
   /*#__PURE__*/ createUseWriteContract({
@@ -381,7 +409,7 @@ export const useWriteRedPacketAcceptOwnership =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"claimRedPacket"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketClaimRedPacket =
   /*#__PURE__*/ createUseWriteContract({
@@ -393,7 +421,7 @@ export const useWriteRedPacketClaimRedPacket =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"createRedPacket"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketCreateRedPacket =
   /*#__PURE__*/ createUseWriteContract({
@@ -405,7 +433,7 @@ export const useWriteRedPacketCreateRedPacket =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"rawFulfillRandomWords"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketRawFulfillRandomWords =
   /*#__PURE__*/ createUseWriteContract({
@@ -417,7 +445,7 @@ export const useWriteRedPacketRawFulfillRandomWords =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"setCoordinator"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketSetCoordinator =
   /*#__PURE__*/ createUseWriteContract({
@@ -429,7 +457,7 @@ export const useWriteRedPacketSetCoordinator =
 /**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWriteRedPacketTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
@@ -441,7 +469,7 @@ export const useWriteRedPacketTransferOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacket = /*#__PURE__*/ createUseSimulateContract({
   abi: redPacketAbi,
@@ -451,7 +479,7 @@ export const useSimulateRedPacket = /*#__PURE__*/ createUseSimulateContract({
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"acceptOwnership"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketAcceptOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -463,7 +491,7 @@ export const useSimulateRedPacketAcceptOwnership =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"claimRedPacket"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketClaimRedPacket =
   /*#__PURE__*/ createUseSimulateContract({
@@ -475,7 +503,7 @@ export const useSimulateRedPacketClaimRedPacket =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"createRedPacket"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketCreateRedPacket =
   /*#__PURE__*/ createUseSimulateContract({
@@ -487,7 +515,7 @@ export const useSimulateRedPacketCreateRedPacket =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"rawFulfillRandomWords"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketRawFulfillRandomWords =
   /*#__PURE__*/ createUseSimulateContract({
@@ -499,7 +527,7 @@ export const useSimulateRedPacketRawFulfillRandomWords =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"setCoordinator"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketSetCoordinator =
   /*#__PURE__*/ createUseSimulateContract({
@@ -511,7 +539,7 @@ export const useSimulateRedPacketSetCoordinator =
 /**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link redPacketAbi}__ and `functionName` set to `"transferOwnership"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useSimulateRedPacketTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
@@ -523,7 +551,7 @@ export const useSimulateRedPacketTransferOwnership =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketEvent = /*#__PURE__*/ createUseWatchContractEvent(
   { abi: redPacketAbi, address: redPacketAddress },
@@ -532,7 +560,7 @@ export const useWatchRedPacketEvent = /*#__PURE__*/ createUseWatchContractEvent(
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__ and `eventName` set to `"CoordinatorSet"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketCoordinatorSetEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -544,7 +572,7 @@ export const useWatchRedPacketCoordinatorSetEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__ and `eventName` set to `"OwnershipTransferRequested"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketOwnershipTransferRequestedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -556,7 +584,7 @@ export const useWatchRedPacketOwnershipTransferRequestedEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__ and `eventName` set to `"OwnershipTransferred"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -568,7 +596,7 @@ export const useWatchRedPacketOwnershipTransferredEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__ and `eventName` set to `"RedPacketClaimed"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketRedPacketClaimedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
@@ -580,7 +608,7 @@ export const useWatchRedPacketRedPacketClaimedEvent =
 /**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link redPacketAbi}__ and `eventName` set to `"RedPacketCreated"`
  *
- * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x9ada12453663fd9b2d4d55986b519c9a558f5a95)
+ * [__View Contract on Arbitrum Sepolia Arbiscan__](https://sepolia.arbiscan.io/address/0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55)
  */
 export const useWatchRedPacketRedPacketCreatedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({

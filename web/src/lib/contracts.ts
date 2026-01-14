@@ -1,4 +1,4 @@
-export const RED_PACKET_ADDRESS = "0x9ada12453663fd9b2d4d55986b519c9a558f5a95" as const;
+export const RED_PACKET_ADDRESS = "0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55" as const;
 
 // Red Packet Contract ABI
 export const RED_PACKET_ABI = [

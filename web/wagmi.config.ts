@@ -13,7 +13,7 @@ export default defineConfig({
       ],
       deployments: {
         RedPacket: {
-          [arbitrumSepolia.id]: '0x9ada12453663fd9b2d4d55986b519c9a558f5a95',
+          [arbitrumSepolia.id]: '0x62EA36d4aC55BFB842f588bB3251Bb08f8ea9C55',
         },
       },
     }),

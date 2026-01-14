@@ -8,13 +8,17 @@ import {
 import {
     VRFV2PlusClient
 } from "lib/chainlink-brownie-contracts/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import {ReentrancyGuard} from "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol";
+import {SafeERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract RedPacket is VRFConsumerBaseV2Plus {
+contract RedPacket is VRFConsumerBaseV2Plus, ReentrancyGuard {
+    using SafeERC20 for IERC20;
     //errors
     error RedPacket_TotalAmountMustBeGreaterThanZero();
     error RedPacket_NotOwner();
     error RedPacket_AlreadyClaimed();
     error RedPacket_TransferFailed();
+    error RedPacket_PacketNotExist();
 
     /**
      * @dev Struct to store information about a red packet
@@ -40,12 +44,12 @@ contract RedPacket is VRFConsumerBaseV2Plus {
     uint256 private immutable i_subscriptionId;
     bytes32 private immutable i_keyHash;
     uint32 private immutable i_callbackGasLimit;
-    mapping(address => uint256) private participantRedPacketCount;
     mapping(uint256 => RedPacketInfo) private redPackets;
     //requestId to packetId
     mapping(uint256 => uint256) private redPacketRequestIds;
     mapping(address => uint256) private participantClaimedAmount;
     mapping(address => uint256) private participantSendAmount;
+    mapping(address => uint256[]) private userRedPackets;
 
     //event to emit when a new red packet is created
     event RedPacketCreated(uint256 packetId, address indexed owner, uint256 indexed totalAmount, address indexed token);
@@ -92,12 +96,12 @@ contract RedPacket is VRFConsumerBaseV2Plus {
             isActive: true
         });
         redPackets[packetId] = redPacketInfo;
-        participantSendAmount[_owner] = _totalAmount;
+        participantSendAmount[_owner] += _totalAmount;
+        userRedPackets[_owner].push(packetId);
         emit RedPacketCreated(packetId, _owner, _totalAmount, _token);
         packetId = packetId + 1;
 
-        bool success = IERC20(_token).transferFrom(_owner, address(this), _totalAmount);
-        require(success, RedPacket_TransferFailed());
+        IERC20(_token).safeTransferFrom(_owner, address(this), _totalAmount);
     }
 
     /**
@@ -105,9 +109,15 @@ contract RedPacket is VRFConsumerBaseV2Plus {
      * @param claimer The address of the claimer
      * @param _packetId The id of the red packet
      */
-    function claimRedPacket_(address claimer, uint256 _packetId) internal {
-        RedPacketInfo memory redPacketInfo = redPackets[_packetId];
+    function claimRedPacket_(address claimer, uint256 _packetId) internal nonReentrant {
+        RedPacketInfo storage redPacketInfo = redPackets[_packetId];
         require(redPacketInfo.isActive, RedPacket_AlreadyClaimed());
+        require(packetId > _packetId, RedPacket_PacketNotExist());
+        require(redPacketInfo.claimer == address(0), RedPacket_AlreadyClaimed());
+
+
+        uint256 max = redPackets[_packetId].totalAmount * 250 / 100;
+        IERC20(redPacketInfo.token).safeTransferFrom(claimer, address(this), max);
 
         VRFV2PlusClient.RandomWordsRequest memory request = VRFV2PlusClient.RandomWordsRequest({
             keyHash: i_keyHash,
@@ -120,11 +130,8 @@ contract RedPacket is VRFConsumerBaseV2Plus {
         uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
         redPacketRequestIds[requestId] = _packetId;
         redPackets[_packetId].claimer = claimer;
-        participantSendAmount[claimer] = redPackets[_packetId].totalAmount;
 
-        uint256 max = redPackets[_packetId].totalAmount * 250 / 100;
-        bool success =  IERC20(redPacketInfo.token).transferFrom(claimer, address(this), max);
-        require(success, RedPacket_TransferFailed());
+
     }
 
     /**
@@ -143,12 +150,11 @@ contract RedPacket is VRFConsumerBaseV2Plus {
         redPackets[_packetId].claimedAmount = amount;
         uint256 send_amount = redPackets[_packetId].totalAmount + max - amount;
         redPackets[_packetId].isActive = false;
+        participantClaimedAmount[claimer] += amount;
         emit RedPacketClaimed(_packetId, claimer, amount);
 
-        bool success_claim = IERC20(redPackets[_packetId].token).transfer(claimer, send_amount);
-        bool success_return = IERC20(redPackets[_packetId].token).transfer(owner, amount);
-
-        require(success_claim && success_return, RedPacket_TransferFailed());
+        IERC20(redPackets[_packetId].token).safeTransfer(claimer, send_amount);
+        IERC20(redPackets[_packetId].token).safeTransfer(owner, amount);
     }
 
     //getters
@@ -166,5 +172,13 @@ contract RedPacket is VRFConsumerBaseV2Plus {
 
     function getParticipantSendAmount(address _participant) public view returns (uint256) {
         return participantSendAmount[_participant];
+    }
+
+    function getUserRedPackets(address _participant) public view returns (uint256[] memory) {
+        uint256[] memory packets = new uint256[](userRedPackets[_participant].length);
+        for (uint256 i = 0; i < userRedPackets[_participant].length; i++) {
+            packets[i] = userRedPackets[_participant][i];
+        }
+        return packets;
     }
 }

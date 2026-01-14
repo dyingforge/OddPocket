@@ -12,6 +12,7 @@ import {
   useWriteRedPacketClaimRedPacket,
   useReadRedPacketGetParticipantClaimedAmount,
   useWatchRedPacketRedPacketCreatedEvent,
+  useWatchRedPacketRedPacketClaimedEvent,
   redPacketAddress,
 } from "@/generated";
 import { useAccount, useWaitForTransactionReceipt, usePublicClient, useBalance, useWriteContract, useReadContract } from 'wagmi';
@@ -76,11 +77,8 @@ export default function OpenRedEnvelope() {
     args: address ? [address] : undefined,
   });
 
-  // Mock leaderboard data - 可以后续通过监听事件来填充
-  const [leaderboardData] = useState([
-    { id: "1", name: "Alice", amount: 1000000000000000000 },
-    { id: "2", name: "Bob", amount: 500000000000000000 },
-  ]);
+  // 排行榜数据
+  const [leaderboardData, setLeaderboardData] = useState<Array<{ id: string; name: string; amount: number }>>([]);
 
   // 监听新创建的红包事件
   useWatchRedPacketRedPacketCreatedEvent({
@@ -88,6 +86,15 @@ export default function OpenRedEnvelope() {
       console.log('New red packet created!', logs);
       // 刷新红包列表
       fetchRedPackets();
+    },
+  });
+
+  // 监听红包领取事件，实时更新排行榜
+  useWatchRedPacketRedPacketClaimedEvent({
+    onLogs(logs) {
+      console.log('Red packet claimed!', logs);
+      // 刷新排行榜
+      fetchLeaderboard();
     },
   });
 
@@ -111,7 +118,8 @@ export default function OpenRedEnvelope() {
       const packets: RedPacketInfo[] = [];
       for (const log of logs) {
         const packetId = log.args.packetId as bigint | undefined;
-        if (typeof packetId !== 'bigint' && typeof packetId !== 'number') continue;        
+        if (typeof packetId !== 'bigint' && typeof packetId !== 'number') continue;      
+          
         try {
           // 查询红包信息
           const packetInfo = await publicClient.readContract({
@@ -166,10 +174,60 @@ export default function OpenRedEnvelope() {
     }
   };
 
-  // 初始加载红包列表
+  // 获取排行榜数据
+  const fetchLeaderboard = async () => {
+    if (!publicClient) return;
+    
+    try {
+      // 获取当前区块号
+      const currentBlock = await publicClient.getBlockNumber();
+      const fromBlock = currentBlock - BigInt(9000);
+      
+      // 获取所有 RedPacketClaimed 事件
+      const logs = await publicClient.getLogs({
+        address: redPacketAddress[421614],
+        event: parseAbiItem('event RedPacketClaimed(uint256 packetId, address indexed sender, uint256 indexed amount)'),
+        fromBlock: fromBlock,
+        toBlock: 'latest'
+      });
+
+      console.log('Found claimed events:', logs.length);
+
+      // 聚合每个地址的领取总额
+      const claimsByAddress = new Map<string, bigint>();
+      
+      for (const log of logs) {
+        const claimer = log.args.sender as string | undefined;
+        const amount = log.args.amount as bigint | undefined;
+        
+        if (claimer && amount) {
+          const currentAmount = claimsByAddress.get(claimer) || BigInt(0);
+          claimsByAddress.set(claimer, currentAmount + amount);
+        }
+      }
+
+      // 转换为排行榜格式并排序
+      const leaderboard = Array.from(claimsByAddress.entries())
+        .map(([address, amount]) => ({
+          id: address,
+          name: `${address.slice(0, 6)}...${address.slice(-4)}`, // 地址缩写
+          amount: Number(amount)
+        }))
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, 20); // 只取前 20 名
+
+      console.log('Leaderboard:', leaderboard);
+      setLeaderboardData(leaderboard);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    }
+  };
+
+  // 初始加载红包列表和排行榜
   useEffect(() => {
     if (isConnected && publicClient) {
       fetchRedPackets();
+      fetchLeaderboard();
     }
   }, [isConnected, publicClient]);
 
@@ -188,12 +246,26 @@ export default function OpenRedEnvelope() {
     // 计算最大金额 (250% of totalAmount)
     const maxAmount = (packet.totalAmount * BigInt(250)) / BigInt(100);
     
-    // 检查 ETH 余额
-    if (!ethBalance || ethBalance.value < maxAmount) {
+    // 获取当前余额
+    const currentWethBalance = wethBalance || BigInt(0);
+    const currentEthBalance = ethBalance?.value || BigInt(0);
+    const totalBalance = currentEthBalance + currentWethBalance;
+    
+    // 计算需要 wrap 的金额
+    const needToWrap = maxAmount > currentWethBalance ? maxAmount - currentWethBalance : BigInt(0);
+    
+    // 检查 ETH + WETH 总余额是否足够
+    if (totalBalance < maxAmount) {
+      const shortfall = maxAmount - totalBalance;
       showPopup(
         () => {},
         () => {},
-        `Insufficient ETH balance. You need ${(Number(maxAmount) / 1e18).toFixed(4)} ETH (250% of ${(Number(packet.totalAmount) / 1e18).toFixed(4)} ETH) to claim this red packet.`,
+        `Insufficient balance! You need ${(Number(maxAmount) / 1e18).toFixed(4)} WETH total.\n\n` +
+        `Your balance:\n` +
+        `• WETH: ${(Number(currentWethBalance) / 1e18).toFixed(4)}\n` +
+        `• ETH: ${(Number(currentEthBalance) / 1e18).toFixed(4)}\n` +
+        `• Total: ${(Number(totalBalance) / 1e18).toFixed(4)}\n\n` +
+        `Short: ${(Number(shortfall) / 1e18).toFixed(4)} ETH`,
         false
       );
       return;
@@ -210,8 +282,7 @@ export default function OpenRedEnvelope() {
       setProcessing(true);
       
       // 步骤 1: 检查 WETH 余额，如果不足则包装
-      if (!wethBalance || wethBalance < maxAmount) {
-        const needToWrap = maxAmount - (wethBalance || BigInt(0));
+      if (currentWethBalance < maxAmount) {
         console.log(`Wrapping ${(Number(needToWrap) / 1e18).toFixed(4)} ETH to WETH...`);
         wrapEth({
           address: WETH_ADDRESS,
@@ -313,6 +384,7 @@ export default function OpenRedEnvelope() {
           pendingPacketIdRef.current = null;
           pendingMaxAmountRef.current = BigInt(0);
           fetchRedPackets();
+          fetchLeaderboard(); // 刷新排行榜
           refetchWethBalance();
           refetchAllowance();
         },

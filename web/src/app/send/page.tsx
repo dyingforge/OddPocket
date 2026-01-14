@@ -4,20 +4,22 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import { Gift, Send } from 'lucide-react';
 import { usePopup } from "@/context/PopupProvider";
 import Leaderboard from "@/components/RankList";
 import { 
   useWriteRedPacketCreateRedPacket,
   useReadRedPacketGetParticipantSendAmount,
+  useWatchRedPacketRedPacketCreatedEvent,
   redPacketAddress,
 } from "@/generated";
-import { parseEther, erc20Abi } from 'viem';
+import { parseEther, erc20Abi, parseAbiItem } from 'viem';
 import { useWriteContract, useReadContract, useBalance } from 'wagmi';
 
 export default function SendRedEnvelope() {
   const { isConnected, address } = useAccount();
+  const publicClient = usePublicClient();
   const { showPopup } = usePopup();
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState<string>("0.01");
@@ -91,11 +93,55 @@ export default function SendRedEnvelope() {
     args: address ? [address] : undefined,
   });
 
-  // Mock leaderboard data - TODO: Replace with actual data from contract
-  const [leaderboardData] = useState([
-    { id: "1", name: "Alice", amount: 1000000000000000000 },
-    { id: "2", name: "Bob", amount: 500000000000000000 },
-  ]);
+  // 排行榜数据（发送榜）
+  const [leaderboardData, setLeaderboardData] = useState<Array<{ id: string; name: string; amount: number }>>([]);
+
+  // 获取发送排行榜数据
+  const fetchLeaderboard = async () => {
+    if (!publicClient) return;
+    
+    try {
+      // 获取当前区块号
+      const currentBlock = await publicClient.getBlockNumber();
+      const fromBlock = currentBlock - BigInt(9000);
+      
+      // 获取所有 RedPacketCreated 事件
+      const logs = await publicClient.getLogs({
+        address: redPacketAddress[421614],
+        event: parseAbiItem('event RedPacketCreated(uint256 packetId, address indexed owner, uint256 indexed totalAmount, address indexed token)'),
+        fromBlock,
+        toBlock: 'latest'
+      });
+
+      // 聚合每个地址的发送总额
+      const senderMap = new Map<string, bigint>();
+      
+      for (const log of logs) {
+        const owner = log.args.owner as string;
+        const totalAmount = log.args.totalAmount as bigint;
+        
+        if (owner) {
+          const currentAmount = senderMap.get(owner) || BigInt(0);
+          senderMap.set(owner, currentAmount + totalAmount);
+        }
+      }
+
+      // 转换为数组并排序
+      const leaderboard = Array.from(senderMap.entries())
+        .map(([addr, amount]) => ({
+          id: addr,
+          name: `${addr.slice(0, 6)}...${addr.slice(-4)}`,
+          amount: Number(amount),
+        }))
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, 10); // 取前 10 名
+
+      console.log('Sender leaderboard:', leaderboard);
+      setLeaderboardData(leaderboard);
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+    }
+  };
 
   const handleSend = async () => {
     if (!isConnected || !address) {
@@ -243,6 +289,7 @@ export default function SendRedEnvelope() {
           pendingDescriptionRef.current = '';
           refetchWethBalance();
           refetchAllowance();
+          fetchLeaderboard(); // 刷新排行榜
         },
         () => {
           createSuccessHandled.current = false;
@@ -259,6 +306,22 @@ export default function SendRedEnvelope() {
       setProcessing(false);
     }
   }, [error]);
+
+  // 初始加载排行榜
+  useEffect(() => {
+    if (isConnected && publicClient) {
+      fetchLeaderboard();
+    }
+  }, [isConnected, publicClient]);
+
+  // 监听新创建的红包事件，实时更新排行榜
+  useWatchRedPacketRedPacketCreatedEvent({
+    onLogs(logs) {
+      console.log('New red packet created!', logs);
+      // 刷新排行榜
+      fetchLeaderboard();
+    },
+  });
 
   return (
     <main
