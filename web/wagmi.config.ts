@@ -7,13 +7,13 @@ export default defineConfig({
   contracts: [],
   plugins: [
     foundry({
-      project: '../../',
+      project: '../',
       include: [
         'RedPacket.sol/**',
       ],
       deployments: {
         RedPacket: {
-          [arbitrumSepolia.id]: '0x1f2cf075909149640419229f28e3215d65198357',
+          [arbitrumSepolia.id]: '0x9ada12453663fd9b2d4d55986b519c9a558f5a95',
         },
       },
     }),

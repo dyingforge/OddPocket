@@ -111,8 +111,7 @@ export default function OpenRedEnvelope() {
       const packets: RedPacketInfo[] = [];
       for (const log of logs) {
         const packetId = log.args.packetId as bigint | undefined;
-        if (!packetId) continue;
-        
+        if (typeof packetId !== 'bigint' && typeof packetId !== 'number') continue;        
         try {
           // 查询红包信息
           const packetInfo = await publicClient.readContract({

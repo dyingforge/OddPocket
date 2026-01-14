@@ -1,5 +1,4 @@
-// Red Packet Contract Address - Update this after deployment
-export const RED_PACKET_ADDRESS = "0x1f2cf075909149640419229f28e3215d65198357" as const;
+export const RED_PACKET_ADDRESS = "0x9ada12453663fd9b2d4d55986b519c9a558f5a95" as const;
 
 // Red Packet Contract ABI
 export const RED_PACKET_ABI = [

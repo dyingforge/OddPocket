@@ -11,11 +11,11 @@ import {IERC20} from "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol
  * @dev 运行命令: forge test --fork-url https://sepolia-rollup.arbitrum.io/rpc --match-contract ForkTest -vvv
  */
 contract ForkTest is Test {
-    RedPacket public redPacket = RedPacket(0x1F2CF075909149640419229f28e3215d65198357);
+    RedPacket public redPacket = RedPacket(0x9Ada12453663fd9B2d4d55986B519C9A558f5a95);
     
     address public constant WETH = 0x980B62Da83eFf3D4576C647993b0c1D7faf17c73;
     
-    address public constant VRF_COORDINATOR = 0x41034678D6C633D8a95c75e1138A360a28bA15d1;
+    address public constant VRF_COORDINATOR = 0x5CE8D5A2BC84beb22a398CCA51996F7930313D61;
     
     // 测试用户
     address public owner;

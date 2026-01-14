@@ -38,10 +38,10 @@ contract HelperConfig is Script, CodeConstants {
     function get_arbitrum_sepolia_network_config() public pure returns (NetworkConfig memory) {
         return NetworkConfig({
             chainId: arbitrum_sepolia_CHAIN_ID,
-            vrfCoordinator: 0x41034678D6C633D8a95c75e1138A360a28bA15d1,
+            vrfCoordinator: 0x5CE8D5A2BC84beb22a398CCA51996F7930313D61,
             keyHash: 0x1770bdc7eec7771f7ba4ffd640f34260d7f095b79c92d34a5b2551d6f6cfd2be,
             subscriptionId: 115099438455386338205306979556334760441128316125757931006981360425487999328401,
-            callbackGasLimit: 1000000,
+            callbackGasLimit: 1000000000,
             link: 0xb1D4538B4571d411F07960EF2838Ce337FE1E80E
         });
     }
