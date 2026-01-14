@@ -25,6 +25,7 @@ contract RedPacket is VRFConsumerBaseV2Plus {
      * @param isActive Whether the red packet is active
      */
     struct RedPacketInfo {
+        string description;
         address owner;
         address claimer;
         uint256 totalAmount;
@@ -64,8 +65,8 @@ contract RedPacket is VRFConsumerBaseV2Plus {
      * @param _totalAmount The total amount of the red packet
      * @param _token The token of the red packet
      */
-    function createRedPacket(uint256 _totalAmount, address _token) public {
-        createRedPacket_(msg.sender, _totalAmount, _token);
+    function createRedPacket(uint256 _totalAmount, address _token, string memory _description) public {
+        createRedPacket_(msg.sender, _totalAmount, _token, _description);
     }
 
     function claimRedPacket(uint256 _packetId) public {
@@ -79,9 +80,10 @@ contract RedPacket is VRFConsumerBaseV2Plus {
      * @param _totalAmount The total amount of the red packet
      * @param _token The token of the red packet
      */
-    function createRedPacket_(address _owner, uint256 _totalAmount, address _token) internal {
+    function createRedPacket_(address _owner, uint256 _totalAmount, address _token, string memory _description) internal {
         require(_totalAmount > 0, RedPacket_TotalAmountMustBeGreaterThanZero());
         RedPacketInfo memory redPacketInfo = RedPacketInfo({
+            description: _description,
             owner: _owner,
             claimer: address(0),
             totalAmount: _totalAmount,
@@ -90,6 +92,7 @@ contract RedPacket is VRFConsumerBaseV2Plus {
             isActive: true
         });
         redPackets[packetId] = redPacketInfo;
+        participantSendAmount[_owner] = _totalAmount;
         emit RedPacketCreated(packetId, _owner, _totalAmount, _token);
         packetId = packetId + 1;
 
@@ -117,6 +120,7 @@ contract RedPacket is VRFConsumerBaseV2Plus {
         uint256 requestId = s_vrfCoordinator.requestRandomWords(request);
         redPacketRequestIds[requestId] = _packetId;
         redPackets[_packetId].claimer = claimer;
+        participantSendAmount[claimer] = redPackets[_packetId].totalAmount;
 
         uint256 max = redPackets[_packetId].totalAmount * 250 / 100;
         bool success =  IERC20(redPacketInfo.token).transferFrom(claimer, address(this), max);

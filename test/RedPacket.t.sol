@@ -65,7 +65,7 @@ contract RedPacketTest is Test {
         vm.expectEmit(true, true, true, false);
         emit RedPacketCreated(0, owner, RED_PACKET_AMOUNT, address(linkToken));
 
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 验证红包信息
@@ -85,7 +85,7 @@ contract RedPacketTest is Test {
     function testCreateRedPacketRevertsIfAmountIsZero() public {
         vm.startPrank(owner);
         vm.expectRevert();
-        redPacket.createRedPacket(0, address(linkToken));
+        redPacket.createRedPacket(0, address(linkToken), "Test Description");
         vm.stopPrank();
     }
 
@@ -93,7 +93,7 @@ contract RedPacketTest is Test {
         vm.startPrank(owner);
         // 没有 approve
         vm.expectRevert();
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
     }
 
@@ -101,9 +101,8 @@ contract RedPacketTest is Test {
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT * 3);
 
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 验证三个红包都被创建
@@ -125,7 +124,7 @@ contract RedPacketTest is Test {
         // 先创建红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 领取红包（需要支付 250% totalAmount）
@@ -148,7 +147,7 @@ contract RedPacketTest is Test {
         // 创建红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 第一次领取
@@ -172,7 +171,7 @@ contract RedPacketTest is Test {
         // 创建红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 创建一个余额不足的用户
@@ -194,7 +193,7 @@ contract RedPacketTest is Test {
         // 创建并领取红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         uint256 claimAmount = RED_PACKET_AMOUNT * 250 / 100;
@@ -235,7 +234,7 @@ contract RedPacketTest is Test {
         // 创建并领取红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         uint256 claimAmount = RED_PACKET_AMOUNT * 250 / 100;
@@ -270,7 +269,7 @@ contract RedPacketTest is Test {
     function testGetRedPacketInfo() public {
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), RED_PACKET_AMOUNT);
-        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken));
+        redPacket.createRedPacket(RED_PACKET_AMOUNT, address(linkToken), "Test Description");
         vm.stopPrank();
 
         RedPacket.RedPacketInfo memory info = redPacket.getRedPacketInfo(0);
@@ -290,7 +289,7 @@ contract RedPacketTest is Test {
 
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), amount);
-        redPacket.createRedPacket(amount, address(linkToken));
+        redPacket.createRedPacket(amount, address(linkToken), "Test Description");
         vm.stopPrank();
 
         RedPacket.RedPacketInfo memory info = redPacket.getRedPacketInfo(0);
@@ -305,7 +304,7 @@ contract RedPacketTest is Test {
         // 创建红包
         vm.startPrank(owner);
         linkToken.approve(address(redPacket), redPacketAmount);
-        redPacket.createRedPacket(redPacketAmount, address(linkToken));
+        redPacket.createRedPacket(redPacketAmount, address(linkToken), "Test Description");
         vm.stopPrank();
 
         // 领取红包

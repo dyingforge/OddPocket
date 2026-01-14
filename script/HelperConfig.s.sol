@@ -51,12 +51,10 @@ contract HelperConfig is Script, CodeConstants {
             return activeNetworkConfig;
         }
         //Deploy mock
-        vm.startBroadcast();
         VRFCoordinatorV2_5Mock vrfCoordinatorV2Mock =
-            new VRFCoordinatorV2_5Mock(BASE_FEE, GAS_PRICE_LINK, WEI_PER_UNIT_LINK);
+        new VRFCoordinatorV2_5Mock(BASE_FEE, GAS_PRICE_LINK, WEI_PER_UNIT_LINK);
         MockLinkToken linkToken = new MockLinkToken();
-        vm.stopBroadcast();
-
+        vm.startBroadcast();
         activeNetworkConfig = NetworkConfig({
             chainId: ANVIL_CHAIN_ID,
             vrfCoordinator: address(vrfCoordinatorV2Mock),
@@ -65,12 +63,12 @@ contract HelperConfig is Script, CodeConstants {
             callbackGasLimit: 2500000,
             link: address(linkToken)
         });
-
+        vm.stopBroadcast();
         networkConfigs[ANVIL_CHAIN_ID] = activeNetworkConfig;
         return activeNetworkConfig;
     }
 
     function getActiveNetworkConfig() public view returns (NetworkConfig memory) {
-        return get_arbitrum_sepolia_network_config();
+        return networkConfigs[block.chainid];
     }
 }
