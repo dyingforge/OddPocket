@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Gift, Send } from 'lucide-react';
+import { Gift, Send, User } from 'lucide-react';
 import { usePopup } from "@/context/PopupProvider";
 import Leaderboard from "@/components/RankList";
 import RedPacketCard from "@/components/RedPacketCard";
@@ -430,6 +430,13 @@ export default function OpenRedEnvelope() {
             >
               <Send size={16} />
               <span className="hidden sm:inline">Send</span>
+            </Link>
+            <Link
+              href="/profile"
+              className="flex items-center gap-1 py-2 px-4 bg-white rounded-lg shadow-sm text-red-600 border border-red-200 hover:bg-red-50 transition-colors font-DynaPuff"
+            >
+              <User size={16} />
+              <span className="hidden sm:inline">Profile</span>
             </Link>
           </div>
           
